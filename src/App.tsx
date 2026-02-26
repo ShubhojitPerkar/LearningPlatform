@@ -14,63 +14,37 @@ import LiveClassroom from './pages/LiveClassroom';
 import Profile from './pages/Profile';
 import Help from './pages/Help';
 
-function App() {
+export default function App() {
   const { user, profile, loading } = useAuth();
   const { page, navigate } = useNavigation();
 
   useEffect(() => {
-    if (!loading) {
-      if (!user && page !== 'landing' && page !== 'login') {
-        navigate('landing');
-      }
+    if (loading) return;
 
-      if (user && profile && (page === 'landing' || page === 'login')) {
-        navigate('dashboard');
-      }
+    if (!user && page !== 'landing' && page !== 'login') {
+      navigate('landing');
     }
-  }, [user, profile, loading, page, navigate]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    if (user && profile && (page === 'landing' || page === 'login')) {
+      navigate('dashboard');
+    }
+  }, [user, profile, loading]);
+
+  if (loading) return <div className="p-10">Loading...</div>;
 
   switch (page) {
-    case 'landing':
-      return <Landing />;
-    case 'login':
-      return <Login />;
+    case 'landing': return <Landing />;
+    case 'login': return <Login />;
     case 'dashboard':
-      return user && profile ? (
-        <Dashboard role={profile.role as any} userName={profile.full_name} />
-      ) : (
-        <Login />
-      );
-    case 'student-dashboard':
-      return <StudentDashboard />;
-    case 'teacher-dashboard':
-      return <TeacherDashboard />;
-    case 'parent-dashboard':
-      return <ParentDashboard />;
-    case 'admin-dashboard':
-      return <AdminDashboard />;
-    case 'meeting-lobby':
-      return <MeetingLobby />;
-    case 'live-classroom':
-      return <LiveClassroom />;
-    case 'profile':
-      return <Profile />;
-    case 'help':
-      return <Help />;
-    default:
-      return <Landing />;
+      return profile ? <Dashboard role={profile.role} userName={profile.full_name} /> : <Login />;
+    case 'student-dashboard': return <StudentDashboard />;
+    case 'teacher-dashboard': return <TeacherDashboard />;
+    case 'parent-dashboard': return <ParentDashboard />;
+    case 'admin-dashboard': return <AdminDashboard />;
+    case 'meeting-lobby': return <MeetingLobby />;
+    case 'live-classroom': return <LiveClassroom />;
+    case 'profile': return <Profile />;
+    case 'help': return <Help />;
+    default: return <Landing />;
   }
 }
-
-export default App;
