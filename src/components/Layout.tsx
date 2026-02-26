@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigation } from '../hooks/useNavigation';
 import { LogOut, Shield, User, Bell } from 'lucide-react';
 
 interface LayoutProps {
@@ -8,10 +9,12 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { profile, signOut } = useAuth();
+  const { navigate } = useNavigation();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      navigate('landing'); // 🔑 explicit redirect
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -30,7 +33,9 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 px-3 py-1.5 bg-green-50 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-green-700 font-medium">Encrypted Session</span>
+                <span className="text-sm text-green-700 font-medium">
+                  Encrypted Session
+                </span>
               </div>
 
               <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
@@ -40,8 +45,12 @@ export default function Layout({ children }: LayoutProps) {
 
               <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{profile?.full_name}</p>
-                  <p className="text-xs text-gray-500 capitalize">{profile?.role}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {profile?.full_name || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500 capitalize">
+                    {profile?.role || 'loading'}
+                  </p>
                 </div>
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                   <User className="w-6 h-6 text-white" />
