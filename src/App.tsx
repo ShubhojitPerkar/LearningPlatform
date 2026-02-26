@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { useNavigation } from './hooks/useNavigation';
+
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -16,6 +18,18 @@ function App() {
   const { user, profile, loading } = useAuth();
   const { page, navigate } = useNavigation();
 
+  useEffect(() => {
+    if (!loading) {
+      if (!user && page !== 'landing' && page !== 'login') {
+        navigate('landing');
+      }
+
+      if (user && profile && (page === 'landing' || page === 'login')) {
+        navigate('dashboard');
+      }
+    }
+  }, [user, profile, loading, page, navigate]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -25,16 +39,6 @@ function App() {
         </div>
       </div>
     );
-  }
-
-  if (!user && page !== 'landing' && page !== 'login') {
-    navigate('landing');
-    return null;
-  }
-
-  if (user && profile && (page === 'landing' || page === 'login')) {
-    navigate('dashboard');
-    return null;
   }
 
   switch (page) {
