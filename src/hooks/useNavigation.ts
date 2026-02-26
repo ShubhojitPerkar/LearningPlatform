@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export type Page =
   | 'landing'
@@ -14,23 +14,25 @@ export type Page =
   | 'profile'
   | 'help';
 
-let currentPage: Page = 'landing';
-let listeners: Array<(page: Page) => void> = [];
+function getPageFromHash(): Page {
+  const hash = window.location.hash.replace('#', '');
+  return (hash as Page) || 'landing';
+}
 
 export function useNavigation() {
-  const [page, setPage] = useState<Page>(currentPage);
+  const [page, setPage] = useState<Page>(getPageFromHash());
 
   useEffect(() => {
-    const listener = (newPage: Page) => setPage(newPage);
-    listeners.push(listener);
-    return () => {
-      listeners = listeners.filter(l => l !== listener);
+    const onHashChange = () => {
+      setPage(getPageFromHash());
     };
+
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   const navigate = (newPage: Page) => {
-    currentPage = newPage;
-    listeners.forEach(listener => listener(newPage));
+    window.location.hash = newPage;
   };
 
   return { page, navigate };
