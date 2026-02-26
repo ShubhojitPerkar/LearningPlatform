@@ -1,11 +1,21 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import { Calendar, Video, BookOpen, FileText, Clock, Users, Play } from 'lucide-react';
+import {
+  Calendar,
+  Video,
+  BookOpen,
+  FileText,
+  Clock,
+  Users,
+  Play
+} from 'lucide-react';
 import { useNavigation } from '../hooks/useNavigation';
+
+type Tab = 'upcoming' | 'recordings';
 
 export default function StudentDashboard() {
   const { navigate } = useNavigation();
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'recordings'>('upcoming');
+  const [activeTab, setActiveTab] = useState<Tab>('upcoming');
 
   const upcomingClasses = [
     {
@@ -56,117 +66,96 @@ export default function StudentDashboard() {
     }
   ];
 
-  const handleJoinClass = (link: string) => {
+  const handleJoinClass = () => {
     navigate('meeting-lobby');
   };
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* HEADER */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Student Dashboard</h1>
-          <p className="text-gray-600">Welcome back! Here are your upcoming classes and materials.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Student Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Welcome back! Here are your upcoming classes and materials.
+          </p>
         </div>
 
+        {/* STATS */}
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">12</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Classes This Week</h3>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-green-600" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">94%</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">Attendance Rate</h3>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-purple-600" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">8</span>
-            </div>
-            <h3 className="text-gray-600 font-medium">New Materials</h3>
-          </div>
+          <StatCard icon={<Calendar />} value="12" label="Classes This Week" color="blue" />
+          <StatCard icon={<Users />} value="94%" label="Attendance Rate" color="green" />
+          <StatCard icon={<FileText />} value="8" label="New Materials" color="purple" />
         </div>
 
+        {/* TABS */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
-          <div className="border-b border-gray-200 px-6 py-4">
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setActiveTab('upcoming')}
-                className={`px-4 py-2 font-medium rounded-lg transition ${
-                  activeTab === 'upcoming'
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Upcoming Classes
-              </button>
-              <button
-                onClick={() => setActiveTab('recordings')}
-                className={`px-4 py-2 font-medium rounded-lg transition ${
-                  activeTab === 'recordings'
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Recorded Sessions
-              </button>
-            </div>
+          <div className="border-b px-6 py-4 flex space-x-4">
+            <TabButton
+              active={activeTab === 'upcoming'}
+              onClick={() => setActiveTab('upcoming')}
+              label="Upcoming Classes"
+            />
+            <TabButton
+              active={activeTab === 'recordings'}
+              onClick={() => setActiveTab('recordings')}
+              label="Recorded Sessions"
+            />
           </div>
 
           <div className="p-6">
             {activeTab === 'upcoming' && (
               <div className="space-y-4">
-                {upcomingClasses.map((cls) => (
+                {upcomingClasses.map(cls => (
                   <div
                     key={cls.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:border-blue-300 transition"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                        cls.status === 'live' ? 'bg-red-100' : 'bg-blue-100'
-                      }`}>
-                        <Video className={`w-6 h-6 ${
-                          cls.status === 'live' ? 'text-red-600' : 'text-blue-600'
-                        }`} />
+                      <div
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                          cls.status === 'live' ? 'bg-red-100' : 'bg-blue-100'
+                        }`}
+                      >
+                        <Video
+                          className={`w-6 h-6 ${
+                            cls.status === 'live'
+                              ? 'text-red-600'
+                              : 'text-blue-600'
+                          }`}
+                        />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{cls.title}</h3>
+                        <h3 className="font-semibold">{cls.title}</h3>
                         <p className="text-sm text-gray-600">{cls.teacher}</p>
-                        <div className="flex items-center space-x-4 mt-1">
-                          <span className="text-xs text-gray-500 flex items-center">
+                        <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+                          <span className="flex items-center">
                             <Clock className="w-3 h-3 mr-1" />
                             {cls.time}
                           </span>
-                          <span className="text-xs text-gray-500">{cls.duration}</span>
+                          <span>{cls.duration}</span>
                         </div>
                       </div>
                     </div>
+
                     <div className="flex items-center space-x-3">
                       {cls.status === 'live' && (
                         <div className="flex items-center space-x-2 px-3 py-1.5 bg-red-50 rounded-full">
-                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm text-red-700 font-medium">Live Now</span>
+                          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                          <span className="text-sm text-red-700 font-medium">
+                            Live Now
+                          </span>
                         </div>
                       )}
                       <button
-                        onClick={() => handleJoinClass(cls.link)}
-                        className={`px-6 py-2 rounded-lg font-medium transition ${
+                        onClick={handleJoinClass}
+                        className={`px-6 py-2 rounded-lg font-medium text-white ${
                           cls.status === 'live'
-                            ? 'bg-red-600 text-white hover:bg-red-700'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                            ? 'bg-red-600 hover:bg-red-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
                         }`}
                       >
                         {cls.status === 'live' ? 'Join Now' : 'Join'}
@@ -179,26 +168,26 @@ export default function StudentDashboard() {
 
             {activeTab === 'recordings' && (
               <div className="space-y-4">
-                {recordings.map((recording) => (
+                {recordings.map(rec => (
                   <div
-                    key={recording.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition"
+                    key={rec.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:border-blue-300 transition"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                         <Play className="w-6 h-6 text-gray-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{recording.title}</h3>
-                        <p className="text-sm text-gray-600">{recording.teacher}</p>
-                        <div className="flex items-center space-x-4 mt-1">
-                          <span className="text-xs text-gray-500">{recording.date}</span>
-                          <span className="text-xs text-gray-500">{recording.duration}</span>
-                          <span className="text-xs text-gray-500">{recording.views} views</span>
+                        <h3 className="font-semibold">{rec.title}</h3>
+                        <p className="text-sm text-gray-600">{rec.teacher}</p>
+                        <div className="flex space-x-4 text-xs text-gray-500 mt-1">
+                          <span>{rec.date}</span>
+                          <span>{rec.duration}</span>
+                          <span>{rec.views} views</span>
                         </div>
                       </div>
                     </div>
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
                       Watch
                     </button>
                   </div>
@@ -208,33 +197,72 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Class Notes</h2>
+        {/* NOTES */}
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <h2 className="text-lg font-semibold mb-4">Recent Class Notes</h2>
           <div className="space-y-3">
             {[
               { title: 'Calculus - Chapter 5 Notes', date: 'March 15, 2024', size: '2.4 MB' },
               { title: 'Physics Lab Report Template', date: 'March 14, 2024', size: '1.8 MB' },
               { title: 'Algorithm Design Patterns', date: 'March 13, 2024', size: '3.1 MB' }
-            ].map((note, index) => (
+            ].map((note, i) => (
               <div
-                key={index}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                key={i}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
               >
                 <div className="flex items-center space-x-3">
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-gray-900">{note.title}</p>
-                    <p className="text-xs text-gray-500">{note.date} • {note.size}</p>
+                    <p className="font-medium">{note.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {note.date} • {note.size}
+                    </p>
                   </div>
                 </div>
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                   Download
                 </button>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </Layout>
+  );
+}
+
+/* ---------- Small Helpers ---------- */
+
+function StatCard({ icon, value, label, color }: any) {
+  const colors: any = {
+    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 text-green-600',
+    purple: 'bg-purple-100 text-purple-600'
+  };
+
+  return (
+    <div className="bg-white rounded-xl border p-6">
+      <div className="flex justify-between mb-4">
+        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colors[color]}`}>
+          {icon}
+        </div>
+        <span className="text-2xl font-bold">{value}</span>
+      </div>
+      <h3 className="text-gray-600 font-medium">{label}</h3>
+    </div>
+  );
+}
+
+function TabButton({ active, onClick, label }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-lg font-medium transition ${
+        active ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
+      }`}
+    >
+      {label}
+    </button>
   );
 }
